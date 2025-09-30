@@ -1,28 +1,52 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css' rel='stylesheet' />
-  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js'></script>
+  <meta charset="UTF-8">
+  <title>Calendar App</title>
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    #calendar { max-width: 900px; margin: 0 auto; }
+  </style>
 </head>
 <body>
+  <h1>My Calendar</h1>
   <div id='calendar'></div>
+
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       var calendarEl = document.getElementById('calendar');
       var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
-        events: '/api/events',
-        eventColor: 'gray',
+        events: '/api/events',   // Render上ではバックエンドURLに自動的に対応
+        editable: true,
+        selectable: true,
         eventDidMount: function(info) {
-          // ステータスとユーザーで色分け
+          // ステータスで色分け
           if(info.event.extendedProps.status === 'CONFIRMED') info.el.style.backgroundColor = 'green';
           else info.el.style.backgroundColor = 'orange';
 
+          // オーナーで枠線色を変える
           if(info.event.extendedProps.owner === 'user1') info.el.style.border = '2px solid blue';
           else info.el.style.border = '2px solid red';
         },
-        editable: true,
-        selectable: true
+        eventDrop: function(info) {
+          // ドラッグ&ドロップで日付変更時にPUT
+          fetch('/api/events/' + info.event.id, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              title: info.event.title,
+              description: info.event.extendedProps.description,
+              startTime: info.event.start.toISOString(),
+              endTime: info.event.end ? info.event.end.toISOString() : null,
+              status: info.event.extendedProps.status,
+              priority: info.event.extendedProps.priority,
+              owner: info.event.extendedProps.owner
+            })
+          }).then(res => console.log('Updated event', res));
+        }
       });
       calendar.render();
     });

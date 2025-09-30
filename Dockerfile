@@ -1,15 +1,14 @@
-# OpenJDK 17
+# OpenJDK 17 をベースに使用
 FROM eclipse-temurin:17-jdk-jammy
 
+# 作業ディレクトリ
 WORKDIR /app
 
-COPY mvnw .
-COPY .mvn .mvn
-COPY pom.xml .
-COPY src src
+# Maven でビルドした JAR をコピー
+COPY target/calendar-app-0.0.1-SNAPSHOT.jar app.jar
 
-RUN chmod +x mvnw && ./mvnw clean package -DskipTests
-
+# Render が割り当てるポートを使用
 EXPOSE 8080
 
-CMD ["./mvnw", "spring-boot:run", "-Dspring-boot.run.profiles=prod"]
+# コンテナ起動時に Spring Boot アプリを実行
+ENTRYPOINT ["java", "-jar", "app.jar"]
