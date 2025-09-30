@@ -1,27 +1,31 @@
-package com.example.calendar;
+package com.example.calendar.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 public class Event {
+
+    public enum Status { CONFIRMED, TENTATIVE }
+    public enum Priority { LOW, MEDIUM, HIGH }
+
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String title;
-    private LocalDate date;
+    private String description;
 
-    public Event() {}
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
 
-    public Event(String title, LocalDate date) {
-        this.title = title;
-        this.date = date;
-    }
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
-    // getter/setter
-    public Long getId() { return id; }
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
-    public LocalDate getDate() { return date; }
-    public void setDate(LocalDate date) { this.date = date; }
+    @Enumerated(EnumType.STRING)
+    private Priority priority;
+
+    private String owner; // "user1" or "user2"
+
+    // getter / setter
 }
