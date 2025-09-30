@@ -1,5 +1,10 @@
-package com.example.calendar;
+package com.example.calendar.repository;
 
+import com.example.calendar.model.Event;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface EventRepository extends JpaRepository<Event, Long> {}
+@Repository
+public interface EventRepository extends JpaRepository<Event, Long> {
+    // 必要に応じてカスタムクエリを追加可能
+}
